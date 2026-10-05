@@ -23,7 +23,7 @@ npm audit          # should say: found 0 vulnerabilities
 | Contact page | `src/contact.njk` |
 | Colours and fonts | `@theme` block in `src/assets/css/main.css` |
 | The shirt print | `src/assets/img/print.svg` |
-| Security headers | `src/staticwebapp.config.json` |
+| Security headers, hosting | `infra/site.yml` (AWS CloudFormation) |
 
 ## Writing a post
 

@@ -1,140 +1,78 @@
 # Deployment guide
 
-This site deploys to **Azure Static Web Apps (Free tier, £0/month)** via GitHub Actions. Every push to `main` goes live, and every pull request gets its own preview URL.
+The site is plain HTML and CSS in `_site/`, served from a **private S3 bucket behind CloudFront** on CloudFront's **flat-rate Free plan ($0/month, no overage charges)**. GitHub Actions builds every push and pull request, and deploys every push to `main`.
 
-Why Azure Static Web Apps: free hosting with a global CDN, free managed TLS on custom domains, PR preview environments, and security headers controlled from a file in the repo.
+Everything AWS-side is one CloudFormation stack in `infra/site.yml`: the bucket, CloudFront, the security headers, the URL rewrite, the deploy role GitHub uses, and a budget alarm that emails the moment the account spends anything.
 
 ---
 
 ## 1. Before you start
 
-You need:
-
-- **Node 24 LTS** (`nvm install 24` or from nodejs.org). The repo's `.nvmrc` pins this.
-- **Git** and a **GitHub account**
-- An **Azure subscription** (a free account works)
-- **Azure CLI** (`az`) and **GitHub CLI** (`gh`), both optional but they make steps 4 and 5 copy-and-paste
-
-Check everything works locally first:
+- **Node 24 LTS** (`.nvmrc` pins it), **Git**, the **GitHub CLI** (`gh`) and the **AWS CLI** v2.32 or later (for `aws login`)
+- An **AWS account on the Paid plan.** New accounts on the Free plan close after 6 months or when credits run out, which would take the site down. Upgrading keeps the always-free allowances.
+- **MFA on the root user.**
 
 ```bash
-npm ci
-npm audit          # expect: found 0 vulnerabilities
-npm run build      # expect: _site/ folder with 7 pages and feed.xml
-npm run dev        # browse http://localhost:8080
+npm ci && npm audit && npm run build   # expect 0 vulnerabilities, 7 pages and feed.xml
+aws login --region eu-west-2           # opens the browser, then caches short-lived credentials
 ```
 
-## 2. Personalise
-
-Edit `src/_data/site.json`:
-
-```json
-{
-  "name": "Frank",
-  "url": "https://your-domain.co.uk",
-  "email": "you@your-domain.co.uk",
-  "linkedin": "https://www.linkedin.com/in/your-profile",
-  "github": "https://github.com/your-username",
-  "location": "Leeds"
-}
-```
-
-`url` matters: it's used for canonical links and the RSS feed. Set it to the final address (your custom domain, or the `*.azurestaticapps.net` address from step 4 if you don't have one yet).
-
-Then rewrite the two starter posts in `src/blog/posts/`.
-
-## 3. Push to GitHub
+## 2. Create the stack (once)
 
 ```bash
-git init
-git add .
-git commit -m "First commit"
-gh repo create frank-site --private --source=. --push
+aws cloudformation deploy \
+  --region eu-west-2 \
+  --stack-name frank-site \
+  --template-file infra/site.yml \
+  --capabilities CAPABILITY_IAM \
+  --parameter-overrides BudgetEmail=you@example.com
+
+aws cloudformation describe-stacks --region eu-west-2 --stack-name frank-site \
+  --query "Stacks[0].Outputs" --output table
 ```
 
-(No `gh`? Create an empty repo on github.com, then `git remote add origin ...` and `git push -u origin main`.)
+If the account already has a GitHub OIDC provider, add `CreateGitHubOidcProvider=false`. AWS emails the budget address once to confirm the subscription.
 
-## 4. Create the Static Web App
+## 3. Switch the distribution to the Free plan (console, once)
 
-The repo already contains its own workflow at `.github/workflows/azure-static-web-apps.yml`. So create the app **without** linking it to GitHub, otherwise Azure commits a second, generic workflow of its own.
+CloudFront > Distributions > the new distribution > **Pricing plan** > choose **Free**. Without this it bills pay-as-you-go, which is still covered by the always-free tier (1 TB and 10M requests a month) but has no hard cap.
+
+## 4. Point GitHub at the stack
+
+No AWS keys are stored in GitHub. The workflow swaps a GitHub OIDC token for short-lived credentials on a role that only `main` of this repo can assume, and that can only write to this bucket and clear this distribution's cache.
 
 ```bash
-az login
+out() { aws cloudformation describe-stacks --region eu-west-2 --stack-name frank-site \
+  --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text; }
 
-az group create --name rg-frank-site --location westeurope
-
-az staticwebapp create \
-  --name frank-site \
-  --resource-group rg-frank-site \
-  --location westeurope \
-  --sku Free
+gh variable set AWS_REGION --body eu-west-2
+gh variable set AWS_DEPLOY_ROLE_ARN --body "$(out DeployRoleArn)"
+gh variable set S3_BUCKET --body "$(out BucketName)"
+gh variable set CLOUDFRONT_DISTRIBUTION_ID --body "$(out DistributionId)"
 ```
 
-Portal alternative: Create resource > Static Web App > Plan: Free > Deployment source: **Other**.
+Then set `url` in `src/_data/site.json` to the `SiteUrl` output (it drives canonical links and the feed) and push.
 
-## 5. Give GitHub the deployment token
+## 5. What each push does
 
-```bash
-TOKEN=$(az staticwebapp secrets list \
-  --name frank-site \
-  --resource-group rg-frank-site \
-  --query "properties.apiKey" -o tsv)
+1. `npm ci`, then `npm audit --audit-level=low`, which **fails the build on any known vulnerability**
+2. `npm run build`
+3. On `main` only: `aws s3 sync --delete` (HTML revalidates on every visit, CSS and images cache for an hour), then a `/*` CloudFront invalidation
 
-gh secret set AZURE_STATIC_WEB_APPS_API_TOKEN --body "$TOKEN"
-```
+## 6. Custom domain (optional)
 
-Portal alternative: Static Web App > Overview > **Manage deployment token**, copy it, then GitHub repo > Settings > Secrets and variables > Actions > New secret named `AZURE_STATIC_WEB_APPS_API_TOKEN`.
+Request a certificate in ACM in **us-east-1** (CloudFront only reads certificates from there), add the domain as an alternate name on the distribution, and point a CNAME at the CloudFront address. DNS and TLS are included in the Free plan. Update `url` in `site.json` afterwards.
 
-Treat this token like a password. Anyone with it can overwrite the site. If it leaks, reset it from the same screen.
+## 7. Check it's secure
 
-## 6. Deploy
+- **securityheaders.com** should score A or A+. Headers come from the `SecurityHeaders` policy in `infra/site.yml`.
+- **pagespeed.web.dev** should be green across the board.
 
-```bash
-git commit --allow-empty -m "Deploy" && git push
-```
+The Content Security Policy blocks all scripts (`script-src 'none'`) and only lets the contact form post to Web3Forms. If you ever add JavaScript, loosen that deliberately in the template and redeploy the stack.
 
-Watch it in the repo's **Actions** tab. The pipeline:
+## Changing the infrastructure
 
-1. Checks out the code with Node 24
-2. `npm ci` installs the exact locked versions
-3. `npm audit --audit-level=low` **fails the build if any known vulnerability exists**
-4. `npm run build` produces `_site/`
-5. Uploads `_site/` to Azure
-
-Find the live address:
-
-```bash
-az staticwebapp show --name frank-site --resource-group rg-frank-site \
-  --query "defaultHostname" -o tsv
-```
-
-## 7. Custom domain (optional)
-
-For `www.your-domain.co.uk`, add a DNS record at your registrar:
-
-| Type | Name | Value |
-| --- | --- | --- |
-| CNAME | www | *your-app*.azurestaticapps.net |
-
-Then:
-
-```bash
-az staticwebapp hostname set \
-  --name frank-site \
-  --resource-group rg-frank-site \
-  --hostname www.your-domain.co.uk
-```
-
-Azure issues and renews the TLS certificate for free. Apex domains (no `www`) need a TXT validation record instead; the portal's Custom domains blade walks you through it. Remember to update `url` in `site.json` and push.
-
-## 8. Check it's secure
-
-Once live, run the address through:
-
-- **securityheaders.com**: should score A or A+. Headers come from `src/staticwebapp.config.json`.
-- **pagespeed.web.dev**: should be green across the board. There's no JavaScript to slow it down.
-
-The Content Security Policy blocks all scripts (`script-src 'none'`). If you ever add JavaScript, you'll need to loosen that deliberately. That's the point.
+Edit `infra/site.yml` and re-run the `aws cloudformation deploy` command from step 2. To remove everything: empty the bucket (`aws s3 rm s3://BUCKET --recursive`), then `aws cloudformation delete-stack --stack-name frank-site --region eu-west-2`.
 
 ---
 
@@ -149,13 +87,14 @@ The Content Security Policy blocks all scripts (`script-src 'none'`). If you eve
 | @11ty/eleventy-plugin-rss | 3.1.0 |
 | tailwindcss / @tailwindcss/cli | 4.3.3 |
 | actions/checkout, actions/setup-node | v7 |
-| Azure/static-web-apps-deploy | v1 |
+| actions/upload-artifact, download-artifact | v7, v8 |
+| aws-actions/configure-aws-credentials | v6 |
 
 Versions are pinned exactly in `package.json` and locked in `package-lock.json`. Always install with `npm ci`, never `npm install`, so you get what was tested.
 
 ### Dependabot
 
-`.github/dependabot.yml` checks weekly for new versions of npm packages and GitHub Actions and opens a PR for each. Each PR gets a preview deployment, and the audit gate runs on it. If the preview looks right and the checks are green, merge it.
+`.github/dependabot.yml` checks weekly for new versions of npm packages and GitHub Actions and opens a PR for each. The build and audit run on each PR (no preview deployment on AWS). If the checks are green, merge it.
 
 ### The overrides in package.json, and why they're there
 
@@ -177,9 +116,9 @@ Realistically the advisory was low risk here (it only affects build tooling, nev
 
 ### Optional hardening
 
-- **Pin Actions to commit SHAs** instead of `@v7` tags, so a compromised tag can't change what runs. Dependabot updates SHA pins too.
-- **Self-host the fonts.** Outfit currently loads from Google Fonts, which means visitors' IP addresses go to Google. To keep everything first-party, install `@fontsource/outfit`, copy the `.woff2` files into `src/assets/fonts/`, add `@font-face` rules to `main.css`, remove the Google links from `base.njk`, and tighten the CSP to `font-src 'self'`.
-- **Branch protection** on `main` in GitHub, requiring the build job to pass before merging.
+- **Pin Actions to commit SHAs** instead of tags, so a compromised tag can't change what runs. Dependabot updates SHA pins too.
+- **Self-host the fonts.** Outfit loads from Google Fonts, so visitors' IP addresses go to Google. Install `@fontsource/outfit`, copy the `.woff2` files into `src/assets/fonts/`, add `@font-face` rules to `main.css`, remove the Google links from `base.njk`, and tighten the CSP to `font-src 'self'`.
+- **Branch protection** on `main`, requiring the build job to pass before merging.
 
 ---
 
@@ -188,13 +127,10 @@ Realistically the advisory was low risk here (it only affects build tooling, nev
 | Problem | Fix |
 | --- | --- |
 | Build fails at `npm audit` | A new advisory has been published. Run `npm audit` locally, update the affected package (or wait for Dependabot), then push. Don't remove the audit step. |
-| `deployment_token was not provided` | The `AZURE_STATIC_WEB_APPS_API_TOKEN` secret is missing or misspelt (step 5). |
-| Site shows unstyled HTML | The CSS is built by Tailwind after Eleventy runs. Check the Actions log for a Tailwind error. |
+| `Could not assume role with OIDC` | A repo variable is missing or wrong, or the push wasn't to `main`. Check `gh variable list` against the stack outputs. |
+| Old content still showing | Check the invalidation step ran. HTML is never cached by browsers, but CSS can be for up to an hour. |
+| Every page is the 404 page | The bucket is empty or the sync went to the wrong bucket. `aws s3 ls s3://BUCKET` |
+| Budget alert email arrived | Something billed. Check Billing > Bills and confirm the distribution is on the Free pricing plan. |
 | New Tailwind class has no effect | Tailwind only generates classes it finds in files under `src/`. Check for typos, then rebuild. |
 | `Port 8080 is busy` locally | `PORT=8081 npm run dev` |
 | Fonts look wrong locally | Probably offline. They load from Google Fonts and fall back to system fonts without a connection. |
-| Custom domain stuck validating | DNS can take up to 48 hours. Check the CNAME with `dig www.your-domain.co.uk CNAME`. |
-
-## Other hosts
-
-The build output is plain files in `_site/`, so anything that serves static files works. Netlify, Cloudflare Pages and GitHub Pages all work with build command `npm run build` and output folder `_site`. Note that `staticwebapp.config.json` is Azure-specific: on another host you'll need to recreate the security headers and the 404 rule in that host's own format.

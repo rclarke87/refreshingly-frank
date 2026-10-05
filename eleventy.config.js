@@ -7,7 +7,6 @@ const site = JSON.parse(readFileSync("./src/_data/site.json", "utf8"));
 export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/assets/img");
   eleventyConfig.addPassthroughCopy({ "src/assets/img/favicon.svg": "favicon.svg" });
-  eleventyConfig.addPassthroughCopy({ "src/staticwebapp.config.json": "staticwebapp.config.json" });
   eleventyConfig.addWatchTarget("src/assets/css/");
 
   // Tailwind runs after every Eleventy build, so `npm run dev` is one process.

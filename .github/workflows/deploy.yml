@@ -1,0 +1,64 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=low
+      - run: npm run build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: _site
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # lets the job swap a GitHub OIDC token for short-lived AWS credentials
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: _site
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Upload to S3
+        run: |
+          # Pages revalidate every visit; CSS and images may sit in browser caches for an hour.
+          aws s3 sync _site "s3://${{ vars.S3_BUCKET }}" --delete \
+            --exclude "*.html" --exclude "feed.xml" \
+            --cache-control "public, max-age=3600"
+          aws s3 sync _site "s3://${{ vars.S3_BUCKET }}" --delete \
+            --exclude "*" --include "*.html" \
+            --cache-control "public, max-age=0, must-revalidate"
+          aws s3 cp _site/feed.xml "s3://${{ vars.S3_BUCKET }}/feed.xml" \
+            --content-type "application/atom+xml" \
+            --cache-control "public, max-age=0, must-revalidate"
+      - name: Clear the CloudFront cache
+        # One wildcard path counts as one invalidation; 1,000 a month are free.
+        run: aws cloudfront create-invalidation --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/*"
