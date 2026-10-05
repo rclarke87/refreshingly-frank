@@ -63,7 +63,14 @@ Then set `url` in `src/_data/site.json` to the `SiteUrl` output (it drives canon
 
 ## 6. Custom domain (optional)
 
-Request a certificate in ACM in **us-east-1** (CloudFront only reads certificates from there), add the domain as an alternate name on the distribution, and point a CNAME at the CloudFront address. DNS and TLS are included in the Free plan. Update `url` in `site.json` afterwards.
+The site is served on `refreshinglyfrank.co.uk` (DNS at Namecheap); `www.` 301-redirects to it via the CloudFront Function.
+
+1. Request a certificate in ACM in **us-east-1** (CloudFront only reads certificates from there) for the apex and `www.`, with DNS validation. Add its two validation CNAMEs at the DNS host and **leave them there**, ACM needs them to auto-renew.
+2. Once it is `ISSUED`, redeploy the stack with `--parameter-overrides DomainName=example.co.uk CertificateArn=arn:aws:acm:us-east-1:…` (other parameters keep their previous values).
+3. Point the domain at the `cloudfront.net` address: CNAME for `www`, and ALIAS (Namecheap's name for a CNAME-like record at the apex) for `@`.
+4. Set `url` in `site.json` to the domain and push.
+
+ACM certificates and custom domains cost nothing on CloudFront.
 
 ## 7. Check it's secure
 

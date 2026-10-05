@@ -18,9 +18,18 @@ Parameters:
   BudgetEmail:
     Type: String
     Description: Where to send the alert if the account spends a single cent
+  DomainName:
+    Type: String
+    Default: ""
+    Description: Apex domain to serve the site on (www. redirects to it). Leave empty to use only the cloudfront.net address
+  CertificateArn:
+    Type: String
+    Default: ""
+    Description: ACM certificate in us-east-1 covering DomainName and www.DomainName. Must be ISSUED before deploying
 
 Conditions:
   MakeOidcProvider: !Equals [!Ref CreateGitHubOidcProvider, "true"]
+  HasDomain: !Not [!Equals [!Ref DomainName, ""]]
 
 Resources:
   SiteBucket:
@@ -66,18 +75,27 @@ Resources:
         SigningProtocol: sigv4
 
   # S3 behind OAC has no index documents, so /blog/ must become /blog/index.html here.
+  # Also sends www. to the apex domain so there is one canonical address.
   IndexRewriteFunction:
     Type: AWS::CloudFront::Function
     Properties:
       Name: !Sub "${AWS::StackName}-index-rewrite"
       AutoPublish: true
       FunctionConfig:
-        Comment: Map directory URLs to index.html
+        Comment: Redirect www to apex and map directory URLs to index.html
         Runtime: cloudfront-js-2.0
       FunctionCode: |
         function handler(event) {
           var request = event.request;
           var uri = request.uri;
+          var host = request.headers.host ? request.headers.host.value : "";
+          if (host.indexOf("www.") === 0) {
+            return {
+              statusCode: 301,
+              statusDescription: "Moved Permanently",
+              headers: { location: { value: "https://" + host.slice(4) + uri } },
+            };
+          }
           if (uri.endsWith("/")) {
             request.uri = uri + "index.html";
           } else if (uri.split("/").pop().indexOf(".") === -1) {
@@ -131,6 +149,13 @@ Resources:
         IPV6Enabled: true
         PriceClass: PriceClass_All # flat-rate pricing plans reject any other price class
         DefaultRootObject: index.html
+        Aliases: !If [HasDomain, [!Ref DomainName, !Sub "www.${DomainName}"], !Ref AWS::NoValue]
+        ViewerCertificate: !If
+          - HasDomain
+          - AcmCertificateArn: !Ref CertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - !Ref AWS::NoValue
         Origins:
           - Id: site-bucket
             DomainName: !GetAtt SiteBucket.RegionalDomainName
@@ -228,7 +253,7 @@ Resources:
 
 Outputs:
   SiteUrl:
-    Value: !Sub "https://${Distribution.DomainName}"
+    Value: !If [HasDomain, !Sub "https://${DomainName}", !Sub "https://${Distribution.DomainName}"]
   BucketName:
     Value: !Ref SiteBucket
   DistributionId:
