@@ -1,0 +1,143 @@
+---
+layout: layouts/base.njk
+---
+<section class="mx-auto max-w-6xl px-5 sm:px-8 pt-6 pb-20">
+  <h1 class="font-display font-extrabold tracking-tight leading-[0.95] text-[clamp(2.4rem,5.5vw,4.75rem)]">
+    Frank by name.<br>Frank by nature.
+  </h1>
+
+  <div class="mt-10 grid gap-10 lg:grid-cols-12 lg:items-end">
+    <div class="lg:col-span-6 order-2 lg:order-1">
+      <p class="max-w-[34rem] text-xl text-mist">
+        Help desk professional moving into IT support. Six years on Audi's technical help desk,
+        plus hands-on with hardware, Windows and a home lab I run end to end.
+      </p>
+      <p class="mt-5 max-w-[34rem] text-lg">
+        <span class="text-mist">Looking for:</span> {{ site.role }}.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-4">
+        <a href="/contact/" class="btn btn-primary">Get in touch</a>
+        {% if site.cv %}<a href="{{ site.cv }}" class="btn btn-ghost" download>Download my CV</a>{% else %}<a href="/blog/" class="btn btn-ghost">Read the blog</a>{% endif %}
+      </div>
+    </div>
+
+    <div class="lg:col-span-6 order-1 lg:order-2">
+      <div class="shirt relative h-60 sm:h-72 lg:h-[24rem] rounded-[2rem] lg:rounded-tl-[6rem] overflow-hidden" role="img" aria-label="A loud Hawaiian shirt print with a name tag that reads: Hello, my name is Frank">
+        <div class="name-tag absolute left-1/2 top-1/2 -ml-32 -mt-[5.5rem] w-64 rounded-xl overflow-hidden bg-coconut text-night text-center">
+          <p class="bg-hibiscus font-display font-extrabold text-2xl pt-3">Hello</p>
+          <p class="bg-hibiscus font-semibold text-sm pb-3">my name is</p>
+          <p class="font-display font-extrabold text-[2.75rem] leading-none py-6 -rotate-2">Frank</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="skills-heading" class="mx-auto max-w-6xl px-5 sm:px-8 pb-16">
+  <h2 id="skills-heading" class="font-display font-bold text-xl text-mist">Core skills</h2>
+  <ul class="mt-4 flex flex-wrap gap-2">
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">IT support</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Service desk</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">1st line support</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Ticketing</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">SLAs</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Incident management</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Customer service</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Windows 11</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Microsoft 365</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Active Directory and Entra ID</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Hardware repair</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Networking</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">Home lab</li>
+    <li class="rounded-full px-3.5 py-1.5 text-base shadow-[inset_0_0_0_2px_var(--color-reef)]">CompTIA A+ in progress</li>
+  </ul>
+</section>
+
+
+<section class="bg-deep">
+  <div class="mx-auto max-w-6xl px-5 sm:px-8 py-20 grid gap-10 lg:grid-cols-12">
+    <h2 class="lg:col-span-4 font-display font-bold text-4xl sm:text-5xl leading-tight">The honest version</h2>
+    <div class="lg:col-span-7 lg:col-start-6 max-w-[38rem] space-y-5 text-lg">
+      <p>I haven't had "IT" in my job title yet, so here's what I have done.</p>
+      <p>Six years on Audi's technical help desk, through Capita. I logged every case, worked to SLAs and resolved what I could at first line. Where I couldn't, I wrote up detailed notes so a senior technician could pick it up fast. I also shared what I learned with first line colleagues, so more got fixed first time and fewer went to second line.</p>
+      <p>Then supply teaching, which sharpened how I explain technical things to people with no background in them, and customer-facing retail before that, which taught me to stay calm and helpful under pressure.</p>
+      <p>Outside work, I've been building, repairing and maintaining my own kit for years: PCs, laptops, phones and a home lab I run and troubleshoot end to end. So this isn't a career change out of nowhere. It's me getting paid for the thing I already love.</p>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-5 sm:px-8 py-20">
+  <h2 class="font-display font-bold text-4xl sm:text-5xl leading-tight">What I can actually do</h2>
+  <div class="mt-12 grid gap-14 md:grid-cols-2 lg:grid-cols-3">
+    <div>
+      <h3 class="font-display font-bold text-2xl text-hibiscus">Service desk</h3>
+      <dl class="mt-6 space-y-6">
+        <div class="border-l-4 border-hibiscus pl-5">
+          <dt class="font-bold">Ticketing and SLAs</dt>
+          <dd class="text-mist">Six years logging, prioritising and updating cases against service levels.</dd>
+        </div>
+        <div class="border-l-4 border-hibiscus pl-5">
+          <dt class="font-bold">Incident and request handling</dt>
+          <dd class="text-mist">Working knowledge of ITIL practice: log it, triage it, fix or escalate it, close it properly.</dd>
+        </div>
+        <div class="border-l-4 border-hibiscus pl-5">
+          <dt class="font-bold">Escalation done well</dt>
+          <dd class="text-mist">Clear handoff notes when a fix is beyond first line, and lessons shared so fewer issues got there.</dd>
+        </div>
+        <div class="border-l-4 border-hibiscus pl-5">
+          <dt class="font-bold">Explaining tech in plain English</dt>
+          <dd class="text-mist">Classrooms and phone lines both taught me to explain technical things to non-technical people.</dd>
+        </div>
+      </dl>
+    </div>
+    <div>
+      <h3 class="font-display font-bold text-2xl text-mango">Desktop and user support</h3>
+      <dl class="mt-6 space-y-6">
+        <div class="border-l-4 border-mango pl-5">
+          <dt class="font-bold">Windows 11</dt>
+          <dd class="text-mist">Setup, updates, drivers, user profiles and everyday troubleshooting.</dd>
+        </div>
+        <div class="border-l-4 border-mango pl-5">
+          <dt class="font-bold">Microsoft 365</dt>
+          <dd class="text-mist">Outlook, Teams and OneDrive as a daily user, set up and tested in my home lab.</dd>
+        </div>
+        <div class="border-l-4 border-mango pl-5">
+          <dt class="font-bold">Active Directory and Entra ID</dt>
+          <dd class="text-mist">User and group basics, password resets and account unlocks, built and practised in my home lab and through A+.</dd>
+        </div>
+        <div class="border-l-4 border-mango pl-5">
+          <dt class="font-bold">Hardware repair</dt>
+          <dd class="text-mist">Diagnose and repair laptops and desktops, replace screens and components. Built my own gaming PC.</dd>
+        </div>
+      </dl>
+    </div>
+    <div>
+      <h3 class="font-display font-bold text-2xl text-lagoon">Infrastructure and cloud</h3>
+      <dl class="mt-6 space-y-6">
+        <div class="border-l-4 border-lagoon pl-5">
+          <dt class="font-bold">Home lab</dt>
+          <dd class="text-mist">Docker, virtual machines and networking, comfortable on the command line.</dd>
+        </div>
+        <div class="border-l-4 border-lagoon pl-5">
+          <dt class="font-bold">Networking</dt>
+          <dd class="text-mist">IP addressing, DNS, firewall rules and diagnosing connectivity.</dd>
+        </div>
+        <div class="border-l-4 border-lagoon pl-5">
+          <dt class="font-bold">Cloud</dt>
+          <dd class="text-mist">Deployed my own resources in the cloud and get why support is moving to remote compute.</dd>
+        </div>
+        <div class="border-l-4 border-lagoon pl-5">
+          <dt class="font-bold">Certification</dt>
+          <dd class="text-mist">CompTIA A+ in progress.</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="mx-auto max-w-6xl px-5 sm:px-8">
+  <div class="rounded-[2rem] bg-hibiscus text-night px-8 py-14 sm:px-14 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+    <p class="font-display font-extrabold text-2xl sm:text-3xl leading-tight max-w-[40rem]">Hiring for a service desk role? Let's talk.</p>
+    <a href="mailto:{{ site.email }}" class="btn bg-night text-coconut shadow-[5px_5px_0_var(--color-mango)] hover:-translate-x-0.5 hover:-translate-y-0.5 self-start lg:self-auto">Email Frank</a>
+  </div>
+</section>

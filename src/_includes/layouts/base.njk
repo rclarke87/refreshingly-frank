@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if title %}{{ title }} | {% endif %}{{ site.name }} | IT Support and Service Desk</title>
+  <meta name="description" content="{{ description or site.description }}">
+  <meta name="theme-color" content="#04171c">
+  <meta property="og:title" content="{{ title or site.name }}">
+  <meta property="og:description" content="{{ description or site.description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="{{ site.name }}'s blog">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body class="min-h-dvh flex flex-col">
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 btn btn-primary">Skip to content</a>
+
+  <header class="mx-auto w-full max-w-6xl px-5 sm:px-8 py-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+    <a href="/" class="font-display font-extrabold text-2xl sm:text-3xl tracking-tight text-coconut">frank<span class="text-hibiscus">.</span></a>
+    <nav aria-label="Main">
+      <ul class="flex gap-0.5 sm:gap-2 font-display font-semibold text-[0.95rem] sm:text-base">
+        {% set links = [["/", "Home"], ["/blog/", "Blog"], ["/contact/", "Contact"]] %}
+        {% for link in links %}
+          {% set current = (page.url == link[0]) or (link[0] == "/blog/" and page.url.startsWith("/blog/")) %}
+          <li>
+            <a href="{{ link[0] }}"
+               class="block px-2.5 sm:px-3 py-2 rounded-md {% if current %}text-night bg-lagoon{% else %}text-coconut hover:text-lagoon{% endif %}"
+               {% if current %}aria-current="page"{% endif %}>{{ link[1] }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" class="flex-1">
+    {{ content | safe }}
+  </main>
+
+  <footer class="mt-24">
+    <div class="shirt h-5" aria-hidden="true"></div>
+    <div class="mx-auto max-w-6xl px-5 sm:px-8 py-8 flex flex-col sm:flex-row gap-3 justify-between text-mist text-base">
+      <p>&copy; {{ build.year }} {{ site.name }}. Built with Eleventy and Tailwind.</p>
+      <p>No cookies, no trackers, no nonsense.</p>
+    </div>
+  </footer>
+</body>
+</html>

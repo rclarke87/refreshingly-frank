@@ -1,0 +1,11 @@
+---
+layout: layouts/base.njk
+---
+<article class="mx-auto max-w-6xl px-5 sm:px-8 pt-8">
+  <a href="/blog/" class="text-mist hover:text-lagoon">Back to the blog</a>
+  <h1 class="mt-6 font-display font-extrabold tracking-tight leading-[1.02] text-[clamp(2.5rem,6vw,4.5rem)] max-w-[18ch]">{{ title }}</h1>
+  <time datetime="{{ page.date | isoDate }}" class="block mt-5 text-mist">{{ page.date | readableDate }}</time>
+  <div class="prose-frank mt-12 max-w-[38rem] text-lg">
+    {{ content | safe }}
+  </div>
+</article>

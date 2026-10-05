@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+
+  /* Night lagoon base, Hawaiian-shirt accents */
+  --color-night: #04171c;
+  --color-deep: #0a2a30;
+  --color-reef: #12424a;
+  --color-coconut: #fff3e2;
+  --color-mist: #a9c4c0;
+  --color-hibiscus: #ff2e63;
+  --color-mango: #ffb627;
+  --color-lagoon: #2ee6c5;
+  --color-frond: #0b5d4b;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--color-night);
+    color: var(--color-coconut);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-mango);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  ::selection {
+    background: var(--color-hibiscus);
+    color: var(--color-night);
+  }
+}
+
+@layer components {
+  /* The shirt. The one loud thing on the page. */
+  .shirt {
+    background-color: #0fa39a;
+    background-image: url("/assets/img/print.svg");
+    background-size: 260px 260px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.4rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 0.5rem;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+  .btn-primary {
+    background: var(--color-hibiscus);
+    color: var(--color-night);
+    box-shadow: 5px 5px 0 var(--color-mango);
+  }
+  .btn-primary:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--color-mango);
+  }
+  .btn-primary:active {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--color-mango);
+  }
+  .btn-ghost {
+    color: var(--color-coconut);
+    box-shadow: inset 0 0 0 2px var(--color-reef);
+  }
+  .btn-ghost:hover {
+    box-shadow: inset 0 0 0 2px var(--color-lagoon);
+  }
+
+  /* "Hello, my name is" sticker slapped on the shirt */
+  .name-tag {
+    transform: rotate(-7deg);
+    box-shadow: 8px 10px 0 rgb(4 23 28 / 0.55);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .name-tag {
+      animation:
+        slap 520ms cubic-bezier(0.2, 1.6, 0.4, 1) 250ms both,
+        wiggle 7s ease-in-out 3s infinite;
+    }
+  }
+
+  .prose-frank > * + * { margin-top: 1.1em; }
+  .prose-frank h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin-top: 2em;
+  }
+  .prose-frank a {
+    color: var(--color-lagoon);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-frank ul { list-style: disc; padding-left: 1.25em; }
+  .prose-frank code {
+    font-size: 0.9em;
+    background: var(--color-deep);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+}
+
+/* Sits still most of the cycle, then a quick wiggle like it's been flicked */
+@keyframes wiggle {
+  0%, 88%, 100% { transform: rotate(-7deg); }
+  90% { transform: rotate(-12deg); }
+  92% { transform: rotate(-2deg); }
+  94% { transform: rotate(-11deg); }
+  96% { transform: rotate(-4deg); }
+  98% { transform: rotate(-8deg); }
+}
+
+@keyframes slap {
+  0% { transform: rotate(-30deg) scale(1.8); opacity: 0; }
+  100% { transform: rotate(-7deg) scale(1); opacity: 1; }
+}

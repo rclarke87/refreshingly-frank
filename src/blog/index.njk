@@ -1,0 +1,30 @@
+---
+layout: layouts/base.njk
+title: Blog
+description: Things Frank has fixed, broken on purpose, and learned. Written plainly.
+---
+<section class="mx-auto max-w-6xl px-5 sm:px-8 pt-8 pb-10">
+  <h1 class="font-display font-extrabold tracking-tight text-6xl sm:text-7xl">The blog</h1>
+  <p class="mt-6 max-w-[34rem] text-xl text-mist">Things I've fixed, broken on purpose, and learned. Written plainly. There's an <a href="/feed.xml" class="text-lagoon underline underline-offset-4">RSS feed</a> if you're that way inclined.</p>
+</section>
+
+<section class="mx-auto max-w-6xl px-5 sm:px-8">
+  {% set posts = collections.posts | reverse %}
+  {% if posts.length %}
+    <ol class="divide-y divide-reef border-y border-reef">
+      {% for post in posts %}
+        <li>
+          <a href="{{ post.url }}" class="group grid gap-2 sm:grid-cols-12 py-8 sm:items-baseline">
+            <time datetime="{{ post.date | isoDate }}" class="sm:col-span-3 text-mist">{{ post.date | readableDate }}</time>
+            <div class="sm:col-span-9">
+              <h2 class="font-display font-bold text-2xl sm:text-3xl group-hover:text-mango">{{ post.data.title }}</h2>
+              <p class="mt-2 text-mist max-w-[40rem]">{{ post.data.description }}</p>
+            </div>
+          </a>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="text-xl text-mist">Nothing here yet. Frank's probably got a laptop in bits on the kitchen table.</p>
+  {% endif %}
+</section>
