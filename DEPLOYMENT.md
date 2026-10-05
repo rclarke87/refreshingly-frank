@@ -35,7 +35,9 @@ If the account already has a GitHub OIDC provider, add `CreateGitHubOidcProvider
 
 ## 3. Switch the distribution to the Free plan (console, once)
 
-CloudFront > Distributions > the new distribution > **Pricing plan** > choose **Free**. Without this it bills pay-as-you-go, which is still covered by the always-free tier (1 TB and 10M requests a month) but has no hard cap.
+CloudFront > Distributions > the new distribution > **Billing** > **Switch to a plan** > choose **Free**. Without this it bills pay-as-you-go, which is still covered by the always-free tier (1 TB and 10M requests a month) but has no hard cap.
+
+The Free option is greyed out while the AWS account itself is on the Free account plan: flat-rate plans need a Paid account. Flat-rate plans also reject any price class other than `PriceClass_All`, which is why the template uses it.
 
 ## 4. Point GitHub at the stack
 
