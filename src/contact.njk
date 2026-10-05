@@ -9,16 +9,44 @@ permalink: /contact/
     <h1 class="font-display font-extrabold tracking-tight text-6xl sm:text-7xl">Say hello</h1>
     <p class="mt-6 max-w-[34rem] text-xl text-mist">Hiring for a service desk or first-line role? Want to tell me my home lab is wrong? Either is fine. I'm based in {{ site.location }} and I reply within a working day, usually faster.</p>
 
-    <a href="mailto:{{ site.email }}" class="mt-12 inline-block font-display font-extrabold text-[clamp(1.6rem,4.5vw,3rem)] text-mango underline decoration-4 underline-offset-8 hover:text-coconut break-all">{{ site.email }}</a>
+    <a href="{{ ('mailto:' + site.email) | obfuscate | safe }}" class="mt-12 inline-block font-display font-extrabold text-[clamp(1.35rem,3.2vw,2.25rem)] text-mango underline decoration-4 underline-offset-8 hover:text-coconut break-words">{{ site.email | obfuscate | replace("&#64;", "&#64;<wbr>") | safe }}</a>
 
     <ul class="mt-12 flex flex-wrap gap-4">
-      <li><a href="{{ site.linkedin }}" class="btn btn-ghost" rel="me noopener">LinkedIn</a></li>
-      <li><a href="{{ site.github }}" class="btn btn-ghost" rel="me noopener">GitHub</a></li>
+      {% for profile in [["LinkedIn", site.linkedin], ["GitHub", site.github]] %}
+        <li>
+          {% if profile[1] %}
+            <a href="{{ profile[1] }}" class="btn btn-ghost" rel="me noopener">{{ profile[0] }}</a>
+          {% else %}
+            <span class="btn btn-ghost opacity-50 cursor-not-allowed hover:shadow-[inset_0_0_0_2px_var(--color-reef)]" aria-disabled="true">{{ profile[0] }} <span class="text-sm font-semibold text-mist">coming soon</span></span>
+          {% endif %}
+        </li>
+      {% endfor %}
     </ul>
   </div>
 
-  <aside class="lg:col-span-4 lg:col-start-9 self-start rounded-[2rem] bg-deep p-8">
-    <h2 class="font-display font-bold text-2xl">Why no contact form?</h2>
-    <p class="mt-4 text-mist">Forms need a third party to handle your message. Email doesn't. Fewer moving parts, less to go wrong, no data going anywhere it doesn't need to. Frankly, it's the support person's answer.</p>
+  {% if site.web3formsKey %}
+  <aside class="lg:col-span-5 lg:col-start-8 self-start rounded-[2rem] bg-deep p-8" aria-labelledby="form-heading">
+    <h2 id="form-heading" class="font-display font-bold text-2xl">Or drop me a message</h2>
+    <form action="https://api.web3forms.com/submit" method="POST" class="mt-6 space-y-5">
+      <input type="hidden" name="access_key" value="{{ site.web3formsKey }}">
+      <input type="hidden" name="subject" value="New message from your portfolio site">
+      <input type="hidden" name="from_name" value="{{ site.name }}'s portfolio">
+      <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off">
+      <div>
+        <label for="name" class="block font-semibold">Name</label>
+        <input id="name" name="name" type="text" required autocomplete="name" class="mt-2 w-full rounded-lg bg-night px-4 py-3 shadow-[inset_0_0_0_2px_var(--color-reef)] focus:shadow-[inset_0_0_0_2px_var(--color-lagoon)]">
+      </div>
+      <div>
+        <label for="email" class="block font-semibold">Email</label>
+        <input id="email" name="email" type="email" required autocomplete="email" class="mt-2 w-full rounded-lg bg-night px-4 py-3 shadow-[inset_0_0_0_2px_var(--color-reef)] focus:shadow-[inset_0_0_0_2px_var(--color-lagoon)]">
+      </div>
+      <div>
+        <label for="message" class="block font-semibold">Message</label>
+        <textarea id="message" name="message" rows="5" required class="mt-2 w-full rounded-lg bg-night px-4 py-3 shadow-[inset_0_0_0_2px_var(--color-reef)] focus:shadow-[inset_0_0_0_2px_var(--color-lagoon)]"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Send message</button>
+      <p class="text-sm text-mist">Sent via Web3Forms, which forwards it to my inbox.</p>
+    </form>
   </aside>
+  {% endif %}
 </section>

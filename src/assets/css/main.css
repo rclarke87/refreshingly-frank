@@ -51,6 +51,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    white-space: nowrap;
     padding: 0.85rem 1.4rem;
     font-family: var(--font-display);
     font-weight: 700;
@@ -106,6 +107,26 @@
     text-underline-offset: 3px;
   }
   .prose-frank ul { list-style: disc; padding-left: 1.25em; }
+  .prose-frank table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+  .prose-frank th,
+  .prose-frank td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.65em 0.75em 0.65em 0;
+    border-bottom: 1px solid var(--color-reef);
+  }
+  .prose-frank th {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--color-mist);
+    border-bottom-width: 2px;
+  }
+  .prose-frank td:first-child { color: var(--color-mist); }
   .prose-frank code {
     font-size: 0.9em;
     background: var(--color-deep);

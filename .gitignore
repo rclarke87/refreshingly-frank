@@ -1,0 +1,17 @@
+# Claude Code
+CLAUDE.md
+
+# npm
+node_modules/
+npm-debug.log*
+.npm/
+
+# Eleventy build output (also holds the compiled Tailwind CSS)
+_site/
+.cache/
+
+# Environment and editor/OS clutter
+.env
+.env.*
+.DS_Store
+Thumbs.db

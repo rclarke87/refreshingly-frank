@@ -25,6 +25,11 @@ export default function (eleventyConfig) {
     }).format(date)
   );
   eleventyConfig.addFilter("isoDate", (date) => date.toISOString().slice(0, 10));
+  // Emails go out as HTML entities so naive scrapers matching "x@y.z" miss them.
+  // No JS allowed (CSP script-src 'none'), so this is the strongest option left.
+  eleventyConfig.addFilter("obfuscate", (text) =>
+    [...String(text)].map((c) => `&#${c.codePointAt(0)};`).join("")
+  );
 
   eleventyConfig.addPlugin(feedPlugin, {
     type: "atom",
@@ -35,7 +40,7 @@ export default function (eleventyConfig) {
       title: `${site.name}'s blog`,
       subtitle: site.description,
       base: site.url,
-      author: { name: site.name, email: site.email },
+      author: { name: site.name },
     },
   });
 

@@ -138,6 +138,6 @@ layout: layouts/base.njk
 <section class="mx-auto max-w-6xl px-5 sm:px-8">
   <div class="rounded-[2rem] bg-hibiscus text-night px-8 py-14 sm:px-14 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
     <p class="font-display font-extrabold text-2xl sm:text-3xl leading-tight max-w-[40rem]">Hiring for a service desk role? Let's talk.</p>
-    <a href="mailto:{{ site.email }}" class="btn bg-night text-coconut shadow-[5px_5px_0_var(--color-mango)] hover:-translate-x-0.5 hover:-translate-y-0.5 self-start lg:self-auto">Email Frank</a>
+    <a href="{{ ('mailto:' + site.email) | obfuscate | safe }}" class="btn bg-night text-coconut shadow-[5px_5px_0_var(--color-mango)] hover:-translate-x-0.5 hover:-translate-y-0.5 self-start lg:self-auto">Email Frank</a>
   </div>
 </section>
