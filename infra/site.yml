@@ -6,6 +6,10 @@ Parameters:
     Type: String
     Default: rclarke87/refreshingly-frank
     Description: owner/repo allowed to deploy
+  GitHubRepoImmutable:
+    Type: String
+    Default: rclarke87@170981721/refreshingly-frank@1406358141
+    Description: The same repo as owner@ownerId/repo@repoId, the form GitHub's immutable OIDC subject claims use (gh api repos/OWNER/REPO/actions/oidc/customization/sub)
   CreateGitHubOidcProvider:
     Type: String
     AllowedValues: ["true", "false"]
@@ -177,7 +181,9 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                token.actions.githubusercontent.com:sub: !Sub "repo:${GitHubRepo}:ref:refs/heads/main"
+                token.actions.githubusercontent.com:sub:
+                  - !Sub "repo:${GitHubRepo}:ref:refs/heads/main"
+                  - !Sub "repo:${GitHubRepoImmutable}:ref:refs/heads/main"
       Policies:
         - PolicyName: publish-site
           PolicyDocument:
