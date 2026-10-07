@@ -30,7 +30,7 @@ None of it was a course. It was curiosity plus necessity, which might be the mos
 
 ## Then life happened
 
-The dream faded. The route into IT wasn't obvious back then, and nobody told me that tinkering counted for anything. I went to university and studied physics, then became a teacher. In between came customer-facing work at Capita and FEXCO: phones, complaints, tickets, triage, escalation and SLAs.
+The dream faded. The route into IT wasn't obvious back then, and nobody told me that tinkering counted for anything. I went to university and studied physics, then became a teacher. In between came customer-facing work at Audi and FEXCO: phones, complaints, tickets, triage, escalation and SLAs.
 
 I don't see that as wasted time. I got good at the half of IT support that plenty of technical people struggle with, which is helping someone stressed who has no idea why their computer has stopped working.
 
