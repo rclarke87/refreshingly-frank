@@ -36,12 +36,12 @@ I don't see that as wasted time. I got good at the half of IT support that plent
 
 ## Coming back
 
-A few years ago I started tinkering again, and this time I did it properly. I run a home lab on Ubuntu Server with Docker Compose, and I write up what I learn as I go.
+A few years ago I started tinkering again, and this time I did it properly. I run a home lab built like a small office network: a Windows Server domain controller, Windows 11 clients joined to the domain, and Group Policy holding it together. I write up what I learn as I go.
 
 {#
 TODO Frank: this is the most important part of the page. Add two short, real stories here.
-1. Your best one. For example: a container kept crash-looping. How you traced it, what the cause was, how you fixed it, and what you wrote down so next time takes minutes.
-2. A second, shorter one: a port conflict, a permissions error, or a storage mount that wouldn't behave. What you saw, what you tried, what worked.
+1. Your best one. For example: a client wouldn't join the domain, or a Group Policy wasn't applying. How you traced it, what the cause was, how you fixed it, and what you wrote down so next time takes minutes.
+2. A second, shorter one: a DNS misconfiguration, a locked-out account, or a permissions error on a shared folder. What you saw, what you tried, what worked.
 Then a line on the certification you're working towards, with the exam month if you have one.
 #}
 
