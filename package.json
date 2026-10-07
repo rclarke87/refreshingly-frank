@@ -21,6 +21,7 @@
   },
   "overrides": {
     "@parcel/watcher": "2.6.0",
+    "argparse": "2.0.1",
     "chokidar": "4.0.3"
   }
 }

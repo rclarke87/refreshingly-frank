@@ -112,12 +112,14 @@ The latest stable Eleventy (3.1.6) and Tailwind CLI (4.3.3) both pull in an old 
 ```json
 "overrides": {
   "@parcel/watcher": "2.6.0",
+  "argparse": "2.0.1",
   "chokidar": "4.0.3"
 }
 ```
 
 - `@parcel/watcher` 2.6.0 is a newer version of Tailwind's own watcher that drops the vulnerable dependency. Straight swap.
 - `chokidar` 4 removes it from Eleventy's tree, **but breaks Eleventy 3's `--serve` file watching** (it silently stops noticing changes). So `npm run dev` doesn't use `eleventy --serve`. It runs `scripts/dev.js`, a small dev server built only on Node's own libraries, which rebuilds on save and live-reloads the browser.
+- `argparse` 2.0.1 removes `sprintf-js`, which has a moderate advisory (GHSA-hp3w-g68c-fv3c) with no patched version. It reaches the tree through Eleventy → `gray-matter` → `js-yaml` 3 → `argparse` 1. `js-yaml` 3 only uses `argparse` for its command-line tool, which Eleventy never runs, so the swap changes nothing in the build (verified: `_site/` is byte-identical). Remove it once `gray-matter` moves to `js-yaml` 4 or Eleventy drops `gray-matter`.
 
 Realistically the advisory was low risk here (it only affects build tooling, never the deployed site, which is plain HTML and CSS), but the brief was no known vulnerabilities, and this gets `npm audit` to a clean zero without losing anything.
 
