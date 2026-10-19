@@ -14,7 +14,7 @@
     "audit": "npm audit --audit-level=low"
   },
   "devDependencies": {
-    "@11ty/eleventy": "3.1.6",
+    "@11ty/eleventy": "3.1.7",
     "@11ty/eleventy-plugin-rss": "3.1.0",
     "@tailwindcss/cli": "4.3.3",
     "tailwindcss": "4.3.3"
